@@ -59,7 +59,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        data: { id: created._id.toString(), name: created.name, email: created.email },
+        // Mongoose disponibiliza 'id' como string, evitando cast de _id
+        data: { id: created.id, name: created.name, email: created.email },
       },
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
