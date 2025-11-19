@@ -4,6 +4,7 @@
 import React, { useState } from 'react';
 import Feedback from '../components/Feedback';
 import { isValidEmail } from '../lib/validators';
+import styles from '@/styles/Form.module.css';
 
 export default function HomePage() {
   const [name, setName] = useState('');
@@ -49,58 +50,77 @@ export default function HomePage() {
     }
   };
 
+  const nameError = error === 'Nome é obrigatório';
+  const emailError = error === 'Email inválido';
+  const passwordError = error === 'Senha deve ter no mínimo 8 caracteres';
+
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-4">Cadastro de Usuários</h1>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1" htmlFor="name">Nome</label>
+    <main className={styles.container}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Cadastro de Usuários</h1>
+        <form onSubmit={onSubmit} className={styles.form} noValidate>
+          <div className={styles.field}>
+            <label htmlFor="name" className={styles.label}>Nome</label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className={styles.input}
               placeholder="Seu nome"
               required
+              aria-invalid={nameError ? 'true' : 'false'}
             />
+            {nameError && (
+              <span className={styles.helperText} role="alert">{error}</span>
+            )}
           </div>
-          <div>
-            <label className="block mb-1" htmlFor="email">Email</label>
+          <div className={styles.field}>
+            <label htmlFor="email" className={styles.label}>Email</label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className={styles.input}
               placeholder="seuemail@exemplo.com"
               required
+              aria-invalid={emailError ? 'true' : 'false'}
             />
+            {emailError && (
+              <span className={styles.helperText} role="alert">{error}</span>
+            )}
           </div>
-          <div>
-            <label className="block mb-1" htmlFor="password">Senha</label>
+            <div className={styles.field}>
+            <label htmlFor="password" className={styles.label}>Senha</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className={styles.input}
               placeholder="Mínimo 8 caracteres"
               required
               minLength={8}
+              aria-invalid={passwordError ? 'true' : 'false'}
             />
+            {passwordError && (
+              <span className={styles.helperText} role="alert">{error}</span>
+            )}
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-60"
-            disabled={loading}
-          >
-            {loading ? 'Enviando...' : 'Cadastrar'}
-          </button>
+          <div className={styles.actions}>
+            <button
+              type="submit"
+              className={styles.button}
+              disabled={loading}
+            >
+              {loading ? 'Enviando...' : 'Cadastrar'}
+            </button>
+          </div>
         </form>
-
-        <Feedback type={success ? 'success' : 'error'} message={success || error} />
+        <div aria-live="polite">
+          <Feedback type={success ? 'success' : 'error'} message={success || error} />
+        </div>
       </div>
     </main>
   );

@@ -63,11 +63,24 @@ Respostas:
 - 500: `{ "success": false, "error": "Erro interno do servidor" }`
 
 ## Deploy no Vercel
-1. Crie o projeto no Vercel.
-2. Em "Environment Variables", adicione `MONGODB_URI` com o mesmo valor usado localmente (com a senha real).
-3. Verifique se o cluster Atlas permite acesso (IP Whitelist ou 0.0.0.0/0).
-4. Se ocorrer erro de DNS logo após criação do cluster, aguarde alguns minutos.
-5. Rotas usam `runtime = 'nodejs'` e `dynamic = 'force-dynamic'` para garantir execução no ambiente Node e evitar cache.
+Fluxo recomendado:
+1. Faça fork ou push deste repositório para o GitHub (privado ou público).
+2. Acesse Vercel e clique em "Add New... > Project" e importe o repositório.
+3. Em "Environment Variables" adicione:
+  - `MONGODB_URI` = sua string completa do Atlas (sem `<PASSWORD_AQUI>`; use a senha real). Use o valor do `.env.local` que funciona em dev.
+4. Salve as variáveis e prossiga com o deploy. A build deve completar sem erros se a variável estiver definida.
+5. Caso apareça erro de conexão, confirme:
+  - IP de acesso liberado no Atlas (pode usar 0.0.0.0/0 em ambiente de testes).
+  - Senha correta do usuário do cluster.
+  - Cluster ativo (não em pausa / provisioning).
+6. As rotas usam `export const runtime = 'nodejs'` e `export const dynamic = 'force-dynamic'` para evitar caching e garantir ambiente Node (útil para Mongoose).
+7. Para atualizar env em produção, use a aba "Settings > Environment Variables" e re-deploy.
+
+### Boas práticas adicionais
+- Adicione um arquivo `.env.example` (já presente) para documentar variáveis sem expor segredos.
+- Não exponha a senha do banco em issues ou README.
+- Se crescer, considere separar variáveis por ambiente (`Preview`, `Production`).
+- Evite importar `lib/db.ts` em componentes client. Mantenha apenas em rotas / server actions.
 
 ## Erros Comuns
 - `Missing MONGODB_URI`: variável não definida no `.env.local` ou nas variáveis da Vercel.
