@@ -15,19 +15,17 @@ interface MongooseCache {
 }
 
 // Access env via globalThis to avoid TS complaining when @types/node isn't present yet
+// Captura da variável de ambiente. Não lança erro aqui para evitar falha em build na Vercel.
 const MONGODB_URI: string | undefined = (globalThis as any)?.process?.env?.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  // Throw early with a clear message if env is missing
-  throw new Error(
-    'Missing MONGODB_URI. Define it in your .env.local (never commit secrets).'
-  );
-}
 
 let cached: MongooseCache = (globalThis as any)._mongoose || { conn: null, promise: null };
 if (!(globalThis as any)._mongoose) (globalThis as any)._mongoose = cached;
 
 export async function connectDB(): Promise<typeof mongoose> {
+  if (!MONGODB_URI) {
+    // Validação adiada para momento da conexão (runtime), evitando quebrar build.
+    throw new Error('Missing MONGODB_URI. Configure a variável de ambiente antes de iniciar o servidor.');
+  }
   if (cached.conn) {
     // Reuse existing connection
     return cached.conn;
